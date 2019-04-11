@@ -178,8 +178,9 @@ class Solver(object):
                                        dim_wise_kld=dim_wise_kld.data, mean_kld=mean_kld.data)
 
                 if self.global_iter%self.display_step == 0:
+                    print(recon_loss.data)
                     pbar.write('[{}] recon_loss:{:.3f} total_kld:{:.3f} mean_kld:{:.3f}'.format(
-                        self.global_iter, recon_loss.data[0], total_kld.data[0], mean_kld.data[0]))
+                        self.global_iter, float(recon_loss.clone().detach().numpy()), float(total_kld.clone().detach().numpy()), float(mean_kld.clone().detach().numpy())))
 
                     var = logvar.exp().mean(0).data
                     var_str = ''
@@ -227,6 +228,7 @@ class Solver(object):
 
     def viz_lines(self):
         self.net_mode(train=False)
+        print(self.gather.data)
         recon_losses = torch.stack(self.gather.data['recon_loss']).cpu()
 
         mus = torch.stack(self.gather.data['mu']).cpu()

@@ -31,10 +31,11 @@ class CustomTensorDataset(Dataset):
         self.data_tensor = data_tensor
 
     def __getitem__(self, index):
-        return self.data_tensor[index]
+        arr = np.expand_dims(self.data_tensor[index], 0)
+        return torch.from_numpy(arr).float()
 
     def __len__(self):
-        return self.data_tensor.size(0)
+        return self.data_tensor.shape[0]
 
 
 def return_data(args):
@@ -68,8 +69,9 @@ def return_data(args):
             print('Now download dsprites-dataset')
             subprocess.call(['./download_dsprites.sh'])
             print('Finished')
-        data = np.load(root, encoding='bytes')
-        data = torch.from_numpy(data['imgs']).unsqueeze(1).float()
+        # data = np.load(root, encoding='bytes')
+        
+        data = np.memmap("data/dsprites-dataset/dsprites_ndarray_co1sh3sc6or40x32y32_64x64/imgs.npy", dtype="uint8", shape=(737280 , 64 , 64))    
         train_kwargs = {'data_tensor':data}
         dset = CustomTensorDataset
 
